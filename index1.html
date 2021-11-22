@@ -58,6 +58,21 @@
   									},
 								onEachFeature:popUp
 								}).addTo(map);
+				// Adding Legends
+				L.control.Legend({
+				    position: "topright",
+				    collapsed: false,
+				    symbolWidth: 24,
+				    opacity: 1,
+				    column: 2,
+				    legends: [{
+					label: "Illegal Dumping Sites",
+					type: "image",
+					url: "NoDumping.png",
+					weight: 2
+				    }]
+				})
+				.addTo(map);
 				
 		</script>
 	</body>
