@@ -51,7 +51,9 @@
 						}
 					l.bindPopup(out.join("<br />"));
 				}
-}				var noDumpingIcon = L.icon({iconUrl: 'NoDumping.png',iconSize: [30,30]});
+}				
+				var iconPath = 'NoDumping.png';
+				var noDumpingIcon = L.icon({iconUrl: iconPath,iconSize: [30,30]});
 				var jsonTest = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{
 								pointToLayer: function(geoJsonPoint, latlng) {
     									return L.marker(latlng, { icon: noDumpingIcon }); //options object for Marker
@@ -68,7 +70,7 @@
 				    legends: [{
 					label: "Illegal Dumping Sites",
 					type: "image",
-					url: "NoDumping.png",
+					url: iconPath,
 					weight: 2
 				    }]
 				})
