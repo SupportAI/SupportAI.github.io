@@ -42,8 +42,8 @@
 				L.tileLayer(
 			            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 			            {maxZoom: 17}).addTo(map);
-				var ratIcon = L.icon({iconUrl: 'NoDumping.png',iconSize: [30,30]});
-				var jsonTest = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{icon: ratIcon}).addTo(map);
+				var noDumpingIcon = L.icon({iconUrl: 'NoDumping.png',iconSize: [30,30]});
+				var jsonTest = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{icon: noDumpingIcon}).addTo(map);
 				
 		</script>
 	</body>
