@@ -63,7 +63,7 @@
 						for(key in f.properties){
 								out.push(key+": "+f.properties[key]);
 								}
-							out.push('<button class="button", onclick="openTemporalGraph('f.properties['号']');">'+f.properties['号']+' temporal graph</button>');
+							out.push('<button class="button", onclick="openTemporalGraph('+f.properties['号']+');">'+f.properties['号']+' temporal graph</button>');
 							l.bindPopup(out.join("<br />"));
 							}
 					}				
