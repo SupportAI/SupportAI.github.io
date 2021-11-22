@@ -28,8 +28,22 @@
             height: 80px;
             width: 100%;
         }
+	.button {
+		padding: 0;
+		border: none;
+		background: none;
+		color: blue;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 12px;
+		margin: 4px 2px;
+		cursor: pointer;
+		}
+
     </style>
 
+	
 </head>
 <body>
 		<div id="header_bar">
@@ -49,7 +63,7 @@
 						for(key in f.properties){
 								out.push(key+": "+f.properties[key]);
 								}
-							out.push('<button onclick="openTemporalGraph();">'+f.properties['号']+'</button>');
+							out.push('<button class="button", onclick="openTemporalGraph();">'+f.properties['号']+'</button>');
 							l.bindPopup(out.join("<br />"));
 							}
 					}				
