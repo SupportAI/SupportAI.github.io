@@ -42,8 +42,17 @@
 				L.tileLayer(
 			            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 			            {maxZoom: 17}).addTo(map);
-				var noDumpingIcon = L.icon({iconUrl: 'NoDumping.png',iconSize: [30,30]});
-				var jsonTest = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{icon: noDumpingIcon}).addTo(map);
+			
+				function popUp(f,l){
+				var out = [];
+				if (f.properties){
+				for(key in f.properties){
+				    		out.push(key+": "+f.properties[key]);
+						}
+					l.bindPopup(out.join("<br />"));
+				}
+}				var noDumpingIcon = L.icon({iconUrl: 'NoDumping.png',iconSize: [30,30]});
+				var jsonTest = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{onEachFeature:popUp}).addTo(map);
 				
 		</script>
 	</body>
