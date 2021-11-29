@@ -1,97 +1,164 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-<head>
-	<title>NSI - Illegal dumping areas (Hiroshima)</title>
-	<meta charset="utf-8" />
+	<head>
+		<title>NSI - Illegal dumping areas (Hiroshima)</title>
+		<meta charset="utf-8" />
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="leaflet.css" />
-	<script type="text/javascript" src="jquery.min.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="leaflet.css" />
+		<script type="text/javascript" src="jquery.min.js"></script>
 
-	<script src="leaflet.js"></script>
-	<link rel="stylesheet" href="leaflet.legend.css" />
-    	<script type="text/javascript" src="leaflet.legend.js"></script>
-	<script src="leaflet.ajax.min.js"></script>
-    
-	<!-- <script src="http://matchingnotes.com/javascripts/leaflet-google.js"></script> -->
-	<style>
-        body {
-            padding: 0;
-            margin: 0;
-        }
-        html, body, #map {
-            height: 100%;
-            width: 100%;
-        }
+		<script src="leaflet.js"></script>
+		<link rel="stylesheet" href="leaflet.legend.css" />
+				<script type="text/javascript" src="leaflet.legend.js"></script>
+		<script src="leaflet.ajax.min.js"></script>
+			
+		
+		<style>
 
-        #header_bar{
-            background: ##CCCCCC;
-            height: 80px;
-            width: 100%;
-        }
-	.button {
-		padding: 0;
-		border: none;
-		background: none;
-		color: blue;
-		text-align: center;
-		text-decoration: none;
-		display: inline-block;
-		font-size: 12px;
-		margin: 4px 2px;
-		cursor: pointer;
-		}
+					body {
+							padding: 0;
+							margin: 0;
+					}
+					html, body, #map {
+							margin:0;
+							width: 100%;
+							height: 100%
+							/* overflow: hidden; */
+					}      			
+		</style>
+			<style>
+				html,
+				body {
+					height: 100%;
+					margin: 0;
+				}
 
-    </style>
+				.box {
+					display: flex;
+					flex-flow: column;
+					height: 100%;
+				}
 
-	
-</head>
-<body>
-		<div id="header_bar">
-		 <img src="nsi_logo.png" width="220" height="75">
+				.box .row {
+					border: 1px dotted grey;
+				}
+
+				.box .row.header {
+					flex: 0 1 auto;
+					/* The above is shorthand for:
+					flex-grow: 0,
+					flex-shrink: 1,
+					flex-basis: auto
+					*/
+				}
+
+				.box .row.content {
+					flex: 1 1 auto;
+				}
+
+				.box .row.footer {
+					flex: 0 1 40px;
+				}
+			</style>	
+
+			<style>
+				.mybutton {
+						padding: 20;
+						border: none;
+						background: none;
+						color: blue;
+						text-align: center;
+						text-decoration: none;
+						font-size: 14px;
+						margin: 4px 2px;
+						cursor: pointer;
+					}
+					.header_bar{
+						background: whitesmoke;
+						height: 8%;
+						width: 100%;
+						float:right;
+						clear:left;
+						position:relative;
+						/* content:url("logo-social.png"); */
+						/* margin-top:auto;
+						margin-bottom:auto;
+						text-align:left; */
+						/* padding: 5px 0 0 5px; */
+					} 
+			</style>
+
+		
+	</head>
+	<body>
+		
+		<div class="box">
+			<div class="row header">
+				<p><img src="nsi_logo.png" width="180" height="60"></p>
+			</div>
+
+			<!-- <div id="header_bar" > <img src="nsi_logo.png" width="180" height="60">	</div> -->
+
+			<div id="map"></div>
+			 
+			<script>
+						var map = L.map('map').setView([34.661580000000001,132.898629999999997], 11);
+						L.tileLayer(
+											'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+											{maxZoom: 17, minZoom: 5}).addTo(map);
+					
+						function openTemporalGraph(ID){
+							
+							var popup = open("NSIgraph1.png", "Popup", "width=600,height=200");
+							
+							
+							// window.alert(ID);
+							}
+						function popUp(f,l){
+							var out = [];				
+							var showKeys = ["受理 年","発生 年","発生場", "土地の", "廃棄物", "廃棄_1", "廃棄_2", "廃棄_3", "年度末"];
+							
+							if (f.properties){
+								for(key in f.properties){
+									if (showKeys.indexOf(key) != -1 ){
+										out.push(key+": "+f.properties[key]);
+										}
+									}
+									out.push('<button class="mybutton", onclick="openTemporalGraph('+f.properties['号']+')">'+' Temporal Graph</button>');
+									l.bindPopup(out.join("<br />"),{
+										maxWidth: 200
+									});
+								}
+							}		
+								
+						var iconPath = 'NoDumping.png';
+						var noDumpingIcon = L.icon({iconUrl: iconPath,iconSize: [30,30]});
+						var jsonRead = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{
+										pointToLayer: function(geoJsonPoint, latlng) {
+													return L.marker(latlng, { icon: noDumpingIcon }); //options object for Marker
+												},
+										onEachFeature:popUp
+										}).addTo(map);
+						// Adding Legends
+						L.control.Legend({
+								position: "topright",
+								collapsed: false,
+								symbolWidth: 24,
+								opacity: 1,
+								column: 2,
+								legends: [{
+							label: "Illegal Dumping Sites",
+							type: "image",
+							url: iconPath,
+							weight: 2,
+								}]
+						})
+						.addTo(map);
+						
+				</script>
+				
 		</div>
 
-		<div id="map"></div>
-		<script>
-				var map = L.map('map').setView([34.661580000000001,132.898629999999997], 11);
-				L.tileLayer(
-			            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-			            {maxZoom: 17, minZoom: 5}).addTo(map);
-			
-				function popUp(f,l){
-					var out = [];
-					if (f.properties){
-						for(key in f.properties){
-								out.push(key+": "+f.properties[key]);
-								}
-							out.push('<button class="button", onclick="openTemporalGraph('+f.properties['号']+');">'+f.properties['号']+' temporal graph</button>');
-							l.bindPopup(out.join("<br />"));
-							}
-					}				
-				var iconPath = 'NoDumping.png';
-				var noDumpingIcon = L.icon({iconUrl: iconPath,iconSize: [30,30]});
-				var jsonTest = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{
-								pointToLayer: function(geoJsonPoint, latlng) {
-    									return L.marker(latlng, { icon: noDumpingIcon }); //options object for Marker
-  									},
-								onEachFeature:popUp
-								}).addTo(map);
-				// Adding Legends
-				L.control.Legend({
-				    position: "topright",
-				    collapsed: false,
-				    symbolWidth: 24,
-				    opacity: 1,
-				    column: 2,
-				    legends: [{
-					label: "Illegal Dumping Sites",
-					type: "image",
-					url: iconPath,
-					weight: 2
-				    }]
-				})
-				.addTo(map);
-				
-		</script>
-	</body>
-	</html>
+		</body>
+</html>  
