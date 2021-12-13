@@ -94,19 +94,61 @@
 	<body>
 		
 		<div class="box">
-			<div class="row header">
+			<!-- <div class="row header">
 				<p><img src="nsi_logo.png" width="180" height="60"></p>
 			</div>
 
-			<!-- <div id="header_bar" > <img src="nsi_logo.png" width="180" height="60">	</div> -->
+			<div id="header_bar" > <img src="nsi_logo.png" width="180" height="60">	</div> -->
 
 			<div id="map"></div>
 			 
 			<script>
 						var map = L.map('map').setView([34.661580000000001,132.898629999999997], 11);
-						L.tileLayer(
-											'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-											{maxZoom: 17, minZoom: 5}).addTo(map);
+						var map = L.map('map').setView([34.661580000000001,132.898629999999997], 11);
+			// L.tileLayer(
+			// 					'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+			// 					{maxZoom: 17, minZoom: 5}).addTo(map);
+
+			var osm=new L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',{ 
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'});
+	
+			// https: also suppported.
+			var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+				attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+			});
+			
+			// https: also suppported.
+			var Esri_WorldGrayCanvas = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+				attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+				maxZoom: 16
+			}).addTo(map);
+
+			// 	// https: also suppported.
+			// var Stamen_TopOSMFeatures = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toposm-features/{z}/{x}/{y}.{ext}', {
+			// 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+			// 	subdomains: 'abcd',
+			// 	minZoom: 0,
+			// 	maxZoom: 20,
+			// 	ext: 'png',
+			// 	bounds: [[23, 122], [47, 153]],
+			// 	opacity: 0.9
+			// });
+			
+			var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			});
+				//Add layer control
+			var baseMaps = {
+					"Open Street Map": osm,
+					"Imagery":Esri_WorldImagery,
+				"Gray":Esri_WorldGrayCanvas,
+				// "Blue Base":blue,
+				"OSM B&W":OpenStreetMap_BlackAndWhite
+			};
+
+			var overlayMaps = {};
+			L.control.layers(baseMaps, overlayMaps).addTo(map);
 					
 						function openTemporalGraph(ID){
 							
