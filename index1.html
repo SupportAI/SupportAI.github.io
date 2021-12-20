@@ -5,15 +5,16 @@
 		<meta charset="utf-8" />
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="leaflet.css" />
-		<script type="text/javascript" src="jquery.min.js"></script>
+		
+		<script type="text/javascript" src="./jquery.min.js"></script>
 
 		<script src="leaflet.js"></script>
 		<link rel="stylesheet" href="leaflet.legend.css" />
-				<script type="text/javascript" src="leaflet.legend.js"></script>
+		<link rel="stylesheet" href="leaflet.css" />
+		<link rel="stylesheet" href="SupportStyle.css"> <!--Customised CSS file for illegal dumping-->
+		<script type="text/javascript" src="leaflet.legend.js"></script>
 		<script src="leaflet.ajax.min.js"></script>
-			
-		
+		<script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>	
 		<style>
 
 					body {
@@ -25,140 +26,306 @@
 							width: 100%;
 							height: 100%
 							/* overflow: hidden; */
-					}      			
-		</style>
-			<style>
-				html,
-				body {
-					height: 100%;
-					margin: 0;
-				}
-
-				.box {
-					display: flex;
-					flex-flow: column;
-					height: 100%;
-				}
-
-				.box .row {
-					border: 1px dotted grey;
-				}
-
-				.box .row.header {
-					flex: 0 1 auto;
-					/* The above is shorthand for:
-					flex-grow: 0,
-					flex-shrink: 1,
-					flex-basis: auto
-					*/
-				}
-
-				.box .row.content {
-					flex: 1 1 auto;
-				}
-
-				.box .row.footer {
-					flex: 0 1 40px;
-				}
-			</style>	
-
-			<style>
-				.mybutton {
-						padding: 20;
-						border: none;
-						background: none;
-						color: blue;
-						text-align: center;
-						text-decoration: none;
-						font-size: 14px;
-						margin: 4px 2px;
-						cursor: pointer;
-					}
-					.header_bar{
-						background: whitesmoke;
-						height: 8%;
-						width: 100%;
-						float:right;
-						clear:left;
-						position:relative;
-						/* content:url("logo-social.png"); */
-						/* margin-top:auto;
-						margin-bottom:auto;
-						text-align:left; */
-						/* padding: 5px 0 0 5px; */
 					} 
-			</style>
-
-		
+			</style>	
 	</head>
 	<body>
 		
-		<div class="box">
-			<div class="row header">
-				<p><img src="nsi_logo.png" width="180" height="60"></p>
-			</div>
-
-			<!-- <div id="header_bar" > <img src="nsi_logo.png" width="180" height="60">	</div> -->
-
+		<div class="page">
 			<div id="map"></div>
-			 
-			<script>
-						var map = L.map('map').setView([34.661580000000001,132.898629999999997], 11);
-						L.tileLayer(
-											'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-											{maxZoom: 17, minZoom: 5}).addTo(map);
+			<!-- <div class="row header">
+				<p><img src="nsi_logo.png" width="180" height="60"></p>
+			</div> -->
+
+			<div class="box" id="box" style="bottom: -100%;  display:table">
+				<div class="box-inner" style="display:table-cell;">
+					<b id="close" class="list-top " style="color:blue" >(click to close) </b>
 					
-						function openTemporalGraph(ID){
-							
-							var popup = open("NSIgraph1.png", "Popup", "width=600,height=200");
-							
-							
-							// window.alert(ID);
-							}
-						function popUp(f,l){
-							var out = [];				
-							var showKeys = ["受理 年","発生 年","発生場", "土地の", "廃棄物", "廃棄_1", "廃棄_2", "廃棄_3", "年度末"];
-							
-							if (f.properties){
-								for(key in f.properties){
-									if (showKeys.indexOf(key) != -1 ){
-										out.push(key+": "+f.properties[key]);
-										}
-									}
-									out.push('<button class="mybutton", onclick="openTemporalGraph('+f.properties['号']+')">'+' Temporal Graph</button>');
-									l.bindPopup(out.join("<br />"),{
-										maxWidth: 200
-									});
-								}
-							}		
-								
-						var iconPath = 'NoDumping.png';
-						var noDumpingIcon = L.icon({iconUrl: iconPath,iconSize: [30,30]});
-						var jsonRead = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{
-										pointToLayer: function(geoJsonPoint, latlng) {
-													return L.marker(latlng, { icon: noDumpingIcon }); //options object for Marker
-												},
-										onEachFeature:popUp
-										}).addTo(map);
-						// Adding Legends
-						L.control.Legend({
-								position: "topright",
-								collapsed: false,
-								symbolWidth: 24,
-								opacity: 1,
-								column: 2,
-								legends: [{
-							label: "Illegal Dumping Sites",
-							type: "image",
-							url: iconPath,
-							weight: 2,
-								}]
-						})
-						.addTo(map);
-						
-				</script>
-				
+				</div>
+				<div class="box-innerGraph" id ="box-innerGraph" style="display:table-cell;vertical-align:middle;">				
+					<p id="graph" class="graph" style="text-align:center; margin-left:auto;margin-right:auto;width:100%;"></p>
+					<div id="newgraph" class="newgraph"  style="text-align:center;display: flex;align-items: center; justify-content: center;width:100%">
+						</div>
+				</div>
+			</div> 	
+
+			
 		</div>
+
+
+		<script>
+			var map = L.map('map').setView([34.661580000000001,132.898629999999997], 11);
+			// L.tileLayer(
+			// 					'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+			// 					{maxZoom: 17, minZoom: 5}).addTo(map);
+
+			var osm=new L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',{ 
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'});
+	
+			// https: also suppported.
+			var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+				attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+			});
+			
+			// https: also suppported.
+			var Esri_WorldGrayCanvas = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+				attribution: "Tiles &copy; Esri, HERE, Garmin, FAO, NOAA, USGS, &copy OpenStreetMap contributors, and the GIS User Community",//'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+				
+				maxZoom: 16
+			}).addTo(map);
+
+			// 	// NEED TO LOOK INTO IT FOR MORE KIND OF CUSTOMIZED BASE MAP LAYERS
+			// var Stamen_TopOSMFeatures = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toposm-features/{z}/{x}/{y}.{ext}', {
+			// 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+			// 	subdomains: 'abcd',
+			// 	minZoom: 0,
+			// 	maxZoom: 20,
+			// 	ext: 'png',
+			// 	bounds: [[23, 122], [47, 153]],
+			// 	opacity: 0.9
+			// });
+			
+			// var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+			// maxZoom: 18,
+			// attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			// });
+			//OpenStreetMap_BlackAndWhite.addTo(map);
+			
+			// var blue = L.layerGroup([
+			// 			Esri_WorldGrayCanvas,
+			// 	Stamen_TopOSMFeatures
+			// 	]); 
+
+		// click marker
+			var clickmark;
+
+			// At click on a illegalDumping marker, it calls the onMapClick function and passes the layers coordinates.
+			// flipping the coordiate to get latLng for a marker,  
+			function onMapClick(coords) {
+				console.log(coords);
+				var thecoords = coords.toString().split(',');
+				var lat = thecoords[1];
+				var lng = thecoords[0];
+				//if prior marker exists, remove it.
+				if (clickmark != undefined) {
+					map.removeLayer(clickmark);
+				};
+
+				clickmark = L.circleMarker([lat,lng],{
+					radius: 15,
+					color: "None",
+					fillColor:  "red",
+					fillOpacity: 0.4}
+				).addTo(map);
+			}
+			// end of code for click marker.
+
+			//Add layer control to select the visible basemap
+			var baseMaps = {
+					"Open Street Map": osm,
+					"Imagery":Esri_WorldImagery,
+				"Gray":Esri_WorldGrayCanvas,
+				// "Blue Base":blue,
+				// "OSM B&W":OpenStreetMap_BlackAndWhite
+			};
+
+			var overlayMaps = {};
+			L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+			$(function() {
+			
+									$('#close').click(function() {
+										$('#box').animate({
+											'bottom': '-100%'
+										}, 300)
+									});
+
+									});
+
+			// NEED TO REMOVE FUNCTION 	openTemporalGraph					
+			
+			// function openTemporalGraph(ID){
+				
+				// var popup = open("NSIgraph1.png", "Popup", "width=600,height=200");
+				// $(".box-innerGraph").append('<img src="NSIgraph1.png" alt="Temporal Graph of the site" class="center" height="200vh">');
+				// console.log(ID);
+				// window.alert(ID);
+				// var dom= document.getElementById("graph");
+				// dom.textContent = ID;
+				
+				// }
+
+			function popUp(f,l){
+				
+				l.on('click', function (e) {
+						// get coordinates from GeoJSON
+						var coords = e.target.feature.geometry.coordinates
+							// pass coords to function to create marker.(Yellow circle)
+						onMapClick(coords);
+						// Fill the graph area but not visulaize it.
+						var domP= document.getElementById("graph");
+						var domDiv=document.getElementById("newgraph")
+
+						domP.textContent = "Found the site on "+ f.properties["受理 年"];
+
+						var trace1 = {
+														x: [2014, 2015, 2016, 2017],
+														y: [f.properties["2014"],f.properties["2015"],f.properties["2016"],f.properties["2017"]],
+														// mode: 'markers',
+														type: 'scatter',
+														// name: 'Team A',
+														// text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+														textposition: 'top center',
+														textfont: {
+															family:  'Raleway, sans-serif'
+														},
+														marker: { size: 12, color:'#5863f7' },
+														line: {color: "cyan"}
+
+													};
+						var layout = {
+														xaxis: {
+															range: [ 2012, 2018 ]
+														},
+														yaxis: {
+															range: [-9, 4]
+														},
+														autosize: false,
+														width: 'auto',
+														height: 300,
+														margin: {
+															l: 50,
+															r: 50,
+															b: 50,
+															t: 50,
+															pad: 4
+														},
+														paper_bgcolor: '#e2dbdba2',
+														plot_bgcolor: 'silver',
+														// legend: {
+														// 	y: 0.5,
+														// 	yref: 'paper',
+														// 	font: {
+														// 		family: 'Arial, sans-serif',
+														// 		size: 20,
+														// 		color: 'grey',
+														// 	}
+														// },
+														title:'Temporal Backscattering'
+													};
+						var data = [ trace1 ];
+						Plotly.newPlot(domDiv, data, layout);
+
+					});
+
+				var out = [];				
+				var showKeys = ["受理 年","発生 年","発生場", "土地の", "廃棄物", "廃棄_1", "廃棄_2", "廃棄_3", "年度末"];
+				
+				if (f.properties){
+					for(key in f.properties){
+						if (showKeys.indexOf(key) != -1 ){
+							out.push(key+": "+f.properties[key]);
+							}
+						}
+						
+
+						out.push('<button value="mybutton" id="mybutton" class="mybutton"> Temporal Graph</button>');
+						l.bindPopup(out.join("<br />"),{maxWidth: 200});
+						// .on("popupopen", () => {
+
+
+
+						// 	// $('#mybutton').on("click", e =>  {
+						// 	// 			e.stopPropagation();
+						// 	// 			$('#box').animate({
+						// 	// 				'bottom': '0'
+						// 	// 			}, 300);
+										
+						// 	// 			var dps = [f.properties["2014"],f.properties["2015"],f.properties["2016"],f.properties["2017"]];
+						// 	// 			// var dps_list = list(f.properties.items())[0];
+						// 	// 			// window.alert(dps_list);
+						// 	// 			openTemporalGraph(String(dps));
+						// 	// 		});
+						// });
+						
+					}
+				}	
+				
+				map.on("popupopen", function(){
+						$('.mybutton').click(function(e)  {
+								
+										e.stopPropagation();
+										$('#box').animate({
+											'bottom': '0'
+										}, 300);
+										
+										var dps = [f.properties["2014"],f.properties["2015"],f.properties["2016"],f.properties["2017"]];
+										
+									});
+				});
+				map.on("popupclose", function(e){
+					
+					$('#box').animate({
+											'bottom': '-100%'
+										}, 300);
+					map.removeLayer(clickmark);
+				});
+	// 			layer.bindPopup(popupContent).on("popupopen", () => {
+  //   $(".delete-button").on("click", e => {
+  //     e.preventDefault();
+  //     alert(`now delete layer with id ${feature.properties.id}`);
+  //   });
+  // });		
+
+
+
+			var iconPath = 'NoDumping.png';
+			var noDumpingIcon = L.icon({iconUrl: iconPath,iconSize: [30,30]});
+			///////////////////////////////////////////////////////////////////////////////
+			// Get GeoJSON data and create features.
+  // $.getJSON("IllegalDumpingPoints_old.geojson", function(data) {
+  
+	// 		bbTeam = L.geoJson(data, {
+
+	// 		pointToLayer: function(feature, latlng) {
+
+	// 			return L.marker(latlng, { icon: noDumpingIcon }).bindTooltip(feature.properties["受理 年"]);
+	// 					},
+	// 			onEachFeature:popUp
+	// 			}).addTo(map);
+	// 			});
+
+
+
+
+
+			///////////////////////////////////////////////////////////////////////////////
+
+			var jsonRead = new L.GeoJSON.AJAX(["IllegalDumpingPoints_old.geojson"],{
+							pointToLayer: function(geoJsonPoint, latlng) {
+										return L.marker(latlng, { icon: noDumpingIcon }).bindTooltip(geoJsonPoint.properties["受理 年"]); //options object for Marker
+									},
+							onEachFeature:popUp
+							}).addTo(map);
+
+
+			// Adding Legends
+			L.control.Legend({
+					position: "topright",
+					collapsed: false,
+					symbolWidth: 24,
+					opacity: 1,
+					column: 2,
+					legends: [{
+					label: "Illegal Dumping Sites",
+					type: "image",
+					url: iconPath,
+					weight: 2,
+					}]
+			})
+			.addTo(map);
+			
+	</script>
 
 		</body>
 </html>  
