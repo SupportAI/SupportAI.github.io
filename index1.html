@@ -181,6 +181,32 @@
 
 									});
 
+			//////////////////////////"Anomalies.geojson"/////////////////////
+			// function AnomalyRead(filename, json){
+			// 		var jsonFile= [{"type": "FeatureCollection", "properties": [{"index": 174.0, "importance": 1.0954285574587517, "yhat": -3.1765404804985056, "yhat_lower": -6.19984401976408, "yhat_upper": -0.16508671854311802, "fact": 1.7299508966639836, "engDate": "2022.1.31", "ds2": "2019-10-01"}, 
+			// 					{"index": 177.0, "importance": 0.02104747636148868, "yhat": -7.5602849310627, "yhat_lower": -10.05650916074843, "yhat_upper": -4.787555872610982, "fact": -10.272724077947117, "engDate": "2022.1.31", "ds2": "2016-11-01"}, 
+			// 					{"index": 176.0, "importance": -0.03329679649303453, "yhat": -8.974927307822101, "yhat_lower": -11.194819924899353, "yhat_upper": -6.610878060840959, "fact": -6.397850146519373, "engDate": "2022.1.31", "ds2": "2019-02-01"}, 
+			// 					{"index": 176.0, "importance": -0.03781526053527305, "yhat": -8.195012249250546, "yhat_lower": -10.84621491039595, "yhat_upper": -5.69231514780145, "fact": -5.484902144207756, "engDate": "2022.1.31", "ds2": "2019-03-01"}, 
+			// 					{"index": 175.0, "importance": 1.2511014074192621, "yhat": -3.8039714730059027, "yhat_lower": -6.595321870925735, "yhat_upper": -0.6633995842996082, "fact": 2.6419588449057754, "engDate": "2022.1.31", "ds2": "2019-10-01"}]}]
+			// 		var jsonReadAnomaly = new L.GeoJSON.AJAX(["Anomalies.geojson"],{
+			// 						pointToLayer: function(geoJsonPoint, latlng) {
+			// 									// return L.circleMarker(latlng, {
+			// 									// 	//  icon: getIcon(geoJsonPoint.properties["DetectedEn"]) 
+			// 									// 	radius:6,
+			// 									// 	opacity: .8,
+			// 									// 	//color: "#000",
+			// 									// 	color: getColor(geoJsonPoint.properties['DetectedEn']),
+			// 									// 	fillColor: getColor(geoJsonPoint.properties['DetectedEn']),
+			// 									// 	fillOpacity: 0.8
+			// 									// 	}
+			// 										return L.marker(latlng, {
+			// 										icon: getIcon(geoJsonPoint.properties["発生 年"]) 
+			// 										}
+			// 										).bindTooltip(geoJsonPoint.properties["受理 年"]); //options object for Marker
+			// 								},
+			// 						onEachFeature:popUp
+			// 						}).addTo(map);
+			// 		}
 			// NEED TO REMOVE FUNCTION 	openTemporalGraph					
 			
 			// function openTemporalGraph(ID){
@@ -193,6 +219,18 @@
 				// dom.textContent = ID;
 				
 				// }
+			function subtractMonths(numOfMonths, date ) {
+					date.setMonth(date.getMonth() - numOfMonths);
+					return date;
+			}
+			function addMonths(numOfMonths, date ) {
+					date.setMonth(date.getMonth() + numOfMonths);
+					return date;
+			}
+
+
+
+
 
 			function popUp(f,l){
 				
@@ -225,7 +263,47 @@
 														line: {shape: 'spline',  smoothing: 1.3, color: "blue"}
 
 													};
-						  
+						var lineShape ={
+																type: 'line',
+																x0: f.properties["engDate"].replaceAll('.','-'), //"2019-05-08",
+																y0: -15,
+																x1: f.properties["engDate"].replaceAll('.','-'),
+																y1: 15,
+																line: {
+																	color: 'rgb(55, 128, 191)',
+																	width: 3,
+																	dash: 'dashdot'
+																}
+															}
+					  
+						var anomaly = f.properties["anomaly"]
+		
+						var finalShape =[]		
+
+						if (!Array.isArray(anomaly) || anomaly.length>0) {	
+							finalShape.push(lineShape)
+							var i=0
+							for (i ; i < anomaly.length; i++){
+								dict = {
+																	type: 'rect',
+																	x0: subtractMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
+																	y0: -15,
+																	x1: addMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
+																	y1: 15,
+																	line: {
+																		color: 'rgba(128, 0, 128, 0.6)',
+																		width: 2
+																	},
+																	fillcolor: 'rgba(128, 0, 128, 0.3)'
+														// array does not exist, is not an array, or is empty
+														// ⇒ do not attempt to process array
+												}
+								finalShape.push(dict)
+							} 
+						}	else {
+								finalShape.push(lineShape)
+						}
+
 						var layout = {
 														xaxis: {
 															range: x_keys
@@ -243,20 +321,7 @@
 															t: 50,
 															pad: 4
 														},
-														shapes: [
-															//line vertical
-															{
-																type: 'line',
-																x0: f.properties["engDate"].replaceAll('.','-'), //"2019-05-08",
-																y0: -15,
-																x1: f.properties["engDate"].replaceAll('.','-'),
-																y1: 15,
-																line: {
-																	color: 'rgb(55, 128, 191)',
-																	width: 3,
-																	dash: 'dashdot'
-																}
-															}],
+														shapes: finalShape,
 														paper_bgcolor: '#e2dbdba2',
 														plot_bgcolor: 'silver',
 														// legend: {
@@ -395,7 +460,7 @@
 
 			//////////////////////////"IllegalDumpingPoints_old.geojson"/////////////////////
 
-			var jsonRead = new L.GeoJSON.AJAX(["AllDataPoints_SARInfo.geojson"],{
+			var jsonRead = new L.GeoJSON.AJAX(["AllDataPoints_SARInfo_mod.geojson"],{
 							pointToLayer: function(geoJsonPoint, latlng) {
 										// return L.circleMarker(latlng, {
 										// 	//  icon: getIcon(geoJsonPoint.properties["DetectedEn"]) 
@@ -413,6 +478,8 @@
 									},
 							onEachFeature:popUp
 							}).addTo(map);
+
+
 
 
 			// Adding Legends
