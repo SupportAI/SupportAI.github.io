@@ -185,7 +185,7 @@
 						var domP= document.getElementById("graph");
 						var domDiv=document.getElementById("newgraph")
 
-						domP.textContent = "Found the site on "+ f.properties["engDate"]; //####################################
+						// domP.textContent = "Found the site on "+ f.properties["engDate"]; //####################################
 						x_keys=[];
 						y_values=[];
 						for (const [key, value] of Object.entries(f.properties["SAR_info"][0]['SAR_data_max']).sort()) {
@@ -195,6 +195,7 @@
 						var trace1 = {
 														x: x_keys.reverse(),
 														y: y_values.reverse(),
+														name: 'S1 backscattering',
 														mode: 'lines',
 														type: 'scatter',
 														textposition: 'top center',
@@ -205,53 +206,55 @@
 														line: {shape: 'spline',  smoothing: 1.3, color: "blue"}
 
 													};
-						var lineShape ={
-																type: 'line',
-																x0: f.properties["engDate"].replaceAll('.','-'), //"2019-05-08",
-																y0: -15,
-																x1: f.properties["engDate"].replaceAll('.','-'),
-																y1: 15,
-																line: {
-																	color: 'rgb(55, 128, 191)',
-																	width: 3,
-																	dash: 'dashdot'
-																}
-															}
+						// var lineShape ={
+						// 										type: 'line',
+						// 										x0: f.properties["engDate"].replaceAll('.','-'), //"2019-05-08",
+						// 										y0: -15,
+						// 										x1: f.properties["engDate"].replaceAll('.','-'),
+						// 										y1: 15,
+						// 										line: {
+						// 											color: 'rgb(55, 128, 191)',
+						// 											width: 3,
+						// 											dash: 'dashdot'
+						// 										}
+						// 									}
 					  
-						var anomaly = f.properties["anomaly"]
+						// var anomaly = f.properties["anomaly"]
 		
-						var finalShape =[]		
+						// var finalShape =[]		
 
-						if (!Array.isArray(anomaly) || anomaly.length>0) {	
-							finalShape.push(lineShape)
-							var i=0
-							for (i ; i < anomaly.length; i++){
-								dict = {
-																	type: 'rect',
-																	x0: subtractMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
-																	y0: -15,
-																	x1: addMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
-																	y1: 15,
-																	line: {
-																		color: 'rgba(128, 0, 128, 0.6)',
-																		width: 2
-																	},
-																	fillcolor: 'rgba(128, 0, 128, 0.3)'
-														// array does not exist, is not an array, or is empty
-														// ⇒ do not attempt to process array
-												}
-								finalShape.push(dict)
-							} 
-						}	else {
-								finalShape.push(lineShape)
-						}
+						// if (!Array.isArray(anomaly) || anomaly.length>0) {	
+						// 	finalShape.push(lineShape)
+						// 	var i=0
+						// 	for (i ; i < anomaly.length; i++){
+						// 		dict = {
+						// 											type: 'rect',
+						// 											x0: subtractMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
+						// 											y0: -15,
+						// 											x1: addMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
+						// 											y1: 15,
+						// 											line: {
+						// 												color: 'rgba(128, 0, 128, 0.6)',
+						// 												width: 2
+						// 											},
+						// 											fillcolor: 'rgba(128, 0, 128, 0.3)'
+						// 								// array does not exist, is not an array, or is empty
+						// 								// ⇒ do not attempt to process array
+						// 						}
+						// 		finalShape.push(dict)
+						// 	} 
+						// }	else {
+						// 		finalShape.push(lineShape)
+						// }
 
 						var layout = {
 														xaxis: {
-															range: x_keys
+															range: x_keys,
+															title: 'Time'
 														},
 														yaxis: {
-															range: [-12,12]
+															range: [-12,12],
+															title: 'Backscattering Values'
 														},
 														autosize: false,
 														width: 'auto',
@@ -263,9 +266,10 @@
 															t: 50,
 															pad: 4
 														},
-														shapes: finalShape,
-														paper_bgcolor: '#e2dbdba2',
-														plot_bgcolor: 'silver',
+														// shapes: finalShape,
+														paper_bgcolor: '#4F9EA6',
+														plot_bgcolor: 'white',
+														showlegend:true,
 														// legend: {
 														// 	y: 0.5,
 														// 	yref: 'paper',
@@ -275,7 +279,7 @@
 														// 		color: 'grey',
 														// 	}
 														// },
-														title:'Temporal Backscattering'
+														title:'SAR Backscattering and detected anomaly'
 													};
 						var data = [ trace1 ];
 						Plotly.newPlot(domDiv, data, layout);
@@ -283,7 +287,7 @@
 					});
 
 				var out = [];				
-				var showKeys = ["受理 年","発生 年","発生場", "土地の", "廃棄物", "廃棄_1", "廃棄_2", "廃棄_3", "年度末"];
+				var showKeys = ["住所"];
 				
 				if (f.properties){
 					for(key in f.properties){
@@ -358,7 +362,7 @@
 
 			//////////////////////////"IllegalDumpingPoints_old.geojson"/////////////////////
 
-			var jsonRead = new L.GeoJSON.AJAX(["OriginalBuildingPoints_updated.geojson"],{
+			var jsonRead = new L.GeoJSON.AJAX(["OriginalBuildingPoints_updatedNew.geojson"],{
 							pointToLayer: function(geoJsonPoint, latlng) {
 										// return L.circleMarker(latlng, {
 										// 	//  icon: getIcon(geoJsonPoint.properties["DetectedEn"]) 
@@ -370,9 +374,9 @@
 										// 	fillOpacity: 0.8
 										// 	}
 											return L.marker(latlng, {
-											 icon: getIcon(geoJsonPoint.properties["発生 年"]) 
+											 icon: getIcon(geoJsonPoint.properties["U_ID"])
 											}
-											).bindTooltip(geoJsonPoint.properties["受理 年"]); //options object for Marker
+											).bindTooltip("PointID = " + geoJsonPoint.properties["U_ID"]); //options object for Marker
 									},
 							onEachFeature:popUp
 							}).addTo(map);
