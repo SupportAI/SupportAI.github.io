@@ -219,31 +219,32 @@
 						// 										}
 						// 									}
 					  
-						// var anomaly = f.properties["anomaly"]
+						var anomaly = f.properties["anomaly"]
 		
-						// var finalShape =[]		
+						var finalShape =[]		
 
-						// if (!Array.isArray(anomaly) || anomaly.length>0) {	
-						// 	finalShape.push(lineShape)
-						// 	var i=0
-						// 	for (i ; i < anomaly.length; i++){
-						// 		dict = {
-						// 											type: 'rect',
-						// 											x0: subtractMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
-						// 											y0: -15,
-						// 											x1: addMonths(1,new Date(f.properties["anomaly"][i]['ds2'])).toISOString().split('T')[0],
-						// 											y1: 15,
-						// 											line: {
-						// 												color: 'rgba(128, 0, 128, 0.6)',
-						// 												width: 2
-						// 											},
-						// 											fillcolor: 'rgba(128, 0, 128, 0.3)'
-						// 								// array does not exist, is not an array, or is empty
-						// 								// ⇒ do not attempt to process array
-						// 						}
-						// 		finalShape.push(dict)
-						// 	} 
-						// }	else {
+						if (!Array.isArray(anomaly) || anomaly.length>0) {	
+							// finalShape.push(lineShape)
+							var i=0
+							for (i ; i < anomaly.length; i++){
+								dict = {
+																	type: 'rect',
+																	x0: subtractMonths(1,new Date(f.properties["anomaly"][i]['ds'])).toISOString().split('T')[0],
+																	y0: -10,
+																	x1: addMonths(1,new Date(f.properties["anomaly"][i]['ds'])).toISOString().split('T')[0],
+																	y1: 10,
+																	line: {
+																		color: 'rgba(128, 0, 128, 0.6)',
+																		width: 2
+																	},
+																	fillcolor: 'rgba(128, 0, 128, 0.3)'
+														// array does not exist, is not an array, or is empty
+														// ⇒ do not attempt to process array
+												}
+								finalShape.push(dict)
+							} 
+						}	
+						// else {
 						// 		finalShape.push(lineShape)
 						// }
 
@@ -253,7 +254,7 @@
 															title: 'Time'
 														},
 														yaxis: {
-															range: [-12,12],
+															range: [-10,10],
 															title: 'Backscattering Values'
 														},
 														autosize: false,
@@ -266,7 +267,7 @@
 															t: 50,
 															pad: 4
 														},
-														// shapes: finalShape,
+														shapes: finalShape,
 														paper_bgcolor: '#4F9EA6',
 														plot_bgcolor: 'white',
 														showlegend:true,
@@ -362,7 +363,7 @@
 
 			//////////////////////////"IllegalDumpingPoints_old.geojson"/////////////////////
 
-			var jsonRead = new L.GeoJSON.AJAX(["OriginalBuildingPoints_updatedNew.geojson"],{
+			var jsonRead = new L.GeoJSON.AJAX(["OriginalBuildingPoints_updatedNewAnomaly.geojson"],{
 							pointToLayer: function(geoJsonPoint, latlng) {
 										// return L.circleMarker(latlng, {
 										// 	//  icon: getIcon(geoJsonPoint.properties["DetectedEn"]) 
